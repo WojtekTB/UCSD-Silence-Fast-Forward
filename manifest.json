@@ -1,0 +1,25 @@
+{
+    "name": "UCSD Podcast Scilence Skipper",
+    "description": "Help skip scilence in UCSD podcasts.",
+    "version": "0.1",
+    "icons":{"128":"ucsd-icon-128.png"},
+    "action": {
+      "default_popup": "popup.html"
+    },
+    "permissions": [
+      "storage",
+      "activeTab"
+    ],
+    "web_accessible_resources": [{
+      "resources": ["table.html", "scripts/*", "styles/*"],
+      "matches": ["https://podcast.ucsd.edu/*"],
+      "use_dyanmics_url": true
+    }],
+    "content_scripts": [
+      {
+        "matches": ["https://podcast.ucsd.edu/watch/*"],
+        "js": ["scripts/browser_action.js", "scripts/helper_functions.js"]
+      }
+    ],
+    "manifest_version": 3
+}

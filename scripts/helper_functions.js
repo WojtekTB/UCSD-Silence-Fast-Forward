@@ -174,26 +174,3 @@ async function getCurrentCaption(margin = -1){
     }
     return findCaptionByTime(await getVideoCaptions(), currentTime);
 }
-
-const FAST_SPEED = 15;
-const NORM_SPEED = 2;
-
-async function tryFF(){
-    const currentCaption = await getCurrentCaption(2);
-    if(currentCaption === null){
-        setPlaybackSpeed(FAST_SPEED);
-        if(!document.wasFastSpeed){
-            console.log("Switched to fast speed.");
-            document.wasFastSpeed = true;
-        }
-    }
-    else{
-        setPlaybackSpeed(NORM_SPEED);
-        if(document.wasFastSpeed){
-            console.log("Switched to normal speed.");
-            document.wasFastSpeed = false;
-        }
-    }
-}
-
-setInterval(tryFF, 10);

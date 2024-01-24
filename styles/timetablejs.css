@@ -1,0 +1,341 @@
+.timetable {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box
+}
+
+.timetable * {
+    box-sizing: inherit
+}
+
+.timetable li,
+.timetable ul {
+    list-style-type: none;
+    margin: 0
+}
+
+.timetable li,
+.timetable ul {
+    padding: 0
+}
+
+.timetable>aside {
+    flex: none;
+    max-width: 30%;
+    padding: 0 !important;
+    margin-top: 20px;
+    /*border-right: 5px solid transparent;*/
+    position: relative;
+}
+
+.timetable>aside li {
+    padding: 0 15px;
+    background-color: #efefef;
+    line-height: 25px
+}
+
+.timetable>aside li:not(:last-of-type) {
+    border-bottom: 1px solid #fff
+}
+
+.timetable>aside .row-heading {
+    font-family: "Google Sans",Roboto,Arial,sans-serif;
+    display: inline-block;
+    max-width: 100%;
+    overflow-y: hidden;
+overflow-x: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    word-wrap: normal;
+}
+
+.timetable>aside:before {
+    content: "";
+    display: block;
+    background-image: linear-gradient(#e1ecff, #bcd6e6,#95afc9);
+    height: 20px;
+    position: relative;
+    margin-top: -20px;
+    top: 0
+}
+
+.timetable aside li,
+.timetable time li {
+    height: 25px
+}
+
+.timetable>section {
+    flex: 3 0 auto;
+    width: 0;
+    padding: 0 !important
+}
+
+.timetable>section time {
+    display: block;
+    width: 100%;
+    overflow-x: scroll;
+    -webkit-overflow-scrolling: touch
+}
+
+.timetable>section>header {
+    position: relative;
+    top: 0;
+    z-index: 3;
+    width: 100%;
+    overflow-y: hidden;
+overflow-x: hidden;
+    background-image: linear-gradient(#e1ecff, #bcd6e6,#95afc9);
+    transform-style: preserve-3d
+}
+
+.timetable>section>header ul {
+    display: flex;
+    height: 20px;
+    align-items: center
+}
+
+.timetable>section>header li {
+    flex: none;
+    display: block;
+    position: relative;
+    width: 96px
+}
+
+.timetable>section>header li .time-label {
+    font-family: "Google Sans",Roboto,Arial,sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    display: block;
+    position: absolute;
+    transform: translateY(-6px);
+    left: 0
+}
+
+.timetable>section>header li:not(:first-of-type) .time-label {
+    transform: translateX(-50%);
+    transform: translateY(-6px);
+}
+
+.timetable>section>header li:last-of-type {
+    width: 0
+}
+
+.timetable>section>header li:last-of-type .time-label {
+    transform: translateX(-100%);
+    transform: translateY(-6px);
+}
+
+.timetable ul.room-timeline {
+    border-left: none;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch
+}
+
+.timetable ul.room-timeline li {
+    position: relative;
+    background-color: #f4f4f4;
+    height: 25px
+}
+
+.timetable ul.room-timeline li:nth-of-type(odd) {
+    background-color: #fdfdfd
+}
+
+.timetable ul.room-timeline li:first-of-type {
+    border-top: 1px solid #e5e5e5
+}
+
+.timetable ul.room-timeline li:last-of-type {
+    border-bottom: 1px solid #e5e5e5
+}
+
+.timetable ul.room-timeline li:not(:last-of-type) {
+    border-bottom: none
+}
+
+.timetable ul.room-timeline li:first-child .time-entry {
+    height: 44px
+}
+
+.timetable ul.room-timeline li:after,
+.timetable ul.room-timeline li:before {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0
+}
+
+.timetable ul.room-timeline li:before {
+    background-image: linear-gradient(90deg, #e5e5e5 1px, transparent 0);
+    background-size: 24px auto
+}
+
+.timetable ul.room-timeline li:after {
+    background-image: linear-gradient(90deg, #e5e5e5, #e5e5e5 1px, #f4f4f4 0, #f4f4f4 2px, #e5e5e5 0, #e5e5e5 3px, transparent 0, transparent);
+    background-size: 96px auto;
+    background-position: -2px 0
+}
+
+.timetable .time-entry {
+    white-space: nowrap !important;
+    transition: background-color .2s;
+    height: 24px !important;
+    display: block;
+    position: absolute;
+    z-index: 2;
+    padding: 0 2px;
+    white-space: normal;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    transform-style: preserve-3d;
+}
+
+.timetable .time-entry small {
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+    display: block
+}
+
+.timetable .time-entry:hover {
+}
+
+.unusedClass{
+    visibility: hidden !important;
+}
+
+.hoveredClass{
+    background-color: #2a94d5 !important;
+    z-index: 100 !important;
+    border: 2px solid #2a94d5 !important;
+    height: 85% !important;
+}
+.hoveredClassOverlap{
+    background-color: rgb(182, 0, 0) !important;
+    z-index: 100 !important;
+    border: 2px solid red !important;
+    height: 85% !important;
+}
+
+time, [name="scrollheader"]{
+    overflow: hidden !important;
+}
+
+/* BUTTON UI */
+.timeTableButton {
+    font-family: "Google Sans",Roboto,Arial,sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    pointer-events: all;
+}
+
+.timeTableUIContainer {
+    align-items: center;
+    appearance: none;
+    background-color: #fff;
+    border-radius: 24px;
+    border-style: none;
+    box-shadow: rgba(0, 0, 0, .2) 0 3px 5px -1px,rgba(0, 0, 0, .14) 0 6px 10px 0,rgba(0, 0, 0, .12) 0 1px 18px 0;
+    box-sizing: border-box;
+    color: #3c4043;
+    cursor: pointer;
+    display: inline-flex;
+    fill: currentcolor;
+    max-height: 20px;
+    min-height: 20px;
+    padding: 0px;
+    justify-content: center;
+    letter-spacing: .25px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 10px;
+    overflow: visible;
+    padding: 10px 10px;
+    position: relative;
+    text-align: center;
+    text-transform: none;
+    transition: box-shadow 280ms cubic-bezier(.4, 0, .2, 1),opacity 15ms linear 30ms,transform 270ms cubic-bezier(0, 0, .2, 1) 0ms;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    will-change: transform,opacity;
+    z-index: 100;
+    pointer-events: all;
+}
+
+.timeTableUIContainer .timeTableCheckbox {
+    max-width: fit-content;
+}
+
+.timeTableCheckboxLable {
+    font-family: "Google Sans",Roboto,Arial,sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    padding-left: 5px;
+    padding-right: 10px;
+}
+
+.noHover{
+    pointer-events: none;
+}
+
+.timeTableButton:hover {
+    background: #F6F9FE;
+    color: #174ea6;
+}
+
+.timeSlotEnrolled{
+    border-style: solid;
+    border: 1px solid #a6c9e2;
+    background-color: rgb(64, 121, 142);
+    color: white;
+}
+
+.timeSlotWaitlisted{
+    border-style: solid;
+    border: 1px solid #a6c9e2;
+    background-color: #ccffff;
+    color: #222222;
+}
+
+.timeSlotPlanned{
+    border-style: solid;
+    border: 1px solid #a6c9e2;
+    background: #FFFFFF;
+    color: #A0A0A0;
+}
+
+.timeSlotPersonalEvent{
+    border-style: solid;
+    border: 1px solid #a6c9e2;
+    background-color: rgb(64, 121, 142);
+    color: white;
+}
+
+.timetableContainer{
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100vw;
+    /* pointer-events: none;  */
+    z-index: 10;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 0;
+    padding-top: 0;
+}
+
+.topAlignedContainer {
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100vw;
+    z-index: 10;
+}
