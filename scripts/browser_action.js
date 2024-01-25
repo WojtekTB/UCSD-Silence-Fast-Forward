@@ -23,13 +23,16 @@ async function tryFF(){
 
     if(timeUntilNextCaption > 2 && timeSinceLastSubtitle > 0.2){
         // ff to next time
-        const timeToSkipTo = document.ff_downtime_captions[document.lastCaptionIndex].startTime - 0.2;
-        // skip to time
-        // getVideoElement().currentTime = timeToSkipTo;
-
-        setFastSpeed();
-        document.videoFastForwardTimeout = setTimeout(setNormSpeed, ((timeToSkipTo - getVideoElement().currentTime) * 1000)/document.FAST_SPEED);
-        // console.log(timeToSkipTo - getVideoElement().currentTime);
+        const timeToSkipTo = document.ff_downtime_captions[document.lastCaptionIndex].startTime - 0.1;
+        
+        if(document.skipSilenceMode){
+            // skip to time
+            getVideoElement().currentTime = timeToSkipTo;
+        }
+        else{
+            setFastSpeed();
+            document.videoFastForwardTimeout = setTimeout(setNormSpeed, ((timeToSkipTo - getVideoElement().currentTime) * 1000)/document.FAST_SPEED);
+        }
     }
 }
 
@@ -54,20 +57,34 @@ function setNormSpeed(){
 
 function injectCheckboxAndInterval() {
     const actionLinksUl = document.getElementById('actionLinks');
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.id = 'skipSilenceCheckbox';
+    const ffCheckbox = document.createElement('input');
+    ffCheckbox.type = 'checkbox';
+    ffCheckbox.id = 'ffSilenceCheckbox';
 
     const label = document.createElement('label');
-    label.htmlFor = 'skipSilenceCheckbox';
-    label.textContent = 'Skip Silence';
+    label.htmlFor = 'ffSilenceCheckbox';
+    label.textContent = 'Fast-Forward Silence  ';
 
-    actionLinksUl.appendChild(checkbox);
+    actionLinksUl.appendChild(ffCheckbox);
     actionLinksUl.appendChild(label);
-    
 
-    function handleCheckboxChange() {
-        if (checkbox.checked) {
+
+    const skipCheckbox = document.createElement('input');
+    skipCheckbox.type = 'checkbox';
+    skipCheckbox.id = 'ffSilenceCheckbox';
+
+    const skipLabel = document.createElement('label');
+    skipLabel.htmlFor = 'skipSilenceCheckbox';
+    skipLabel.textContent = 'Skip Silence';
+
+    actionLinksUl.appendChild(ffCheckbox);
+    actionLinksUl.appendChild(label);
+
+    actionLinksUl.appendChild(skipCheckbox);
+    actionLinksUl.appendChild(skipLabel);
+    
+    function enableSilenceDetection(checked){
+        if (checked) {
             document.checkForFastForwardInterval = setInterval(tryFF, 100);
             setNormSpeed();
             console.log(getVideoElement());
@@ -77,7 +94,22 @@ function injectCheckboxAndInterval() {
         }
     }
 
-    checkbox.addEventListener('change', handleCheckboxChange);
+    function handleFFCheckboxChange() {
+        document.skipSilenceMode = false;
+        skipCheckbox.checked = false;
+        setNormSpeed();
+        enableSilenceDetection(ffCheckbox.checked);
+    }
+
+    function handleSkipModeCheckboxChange(){
+        document.skipSilenceMode = true;
+        ffCheckbox.checked = false;
+        setNormSpeed();
+        enableSilenceDetection(skipCheckbox.checked);
+    }
+
+    ffCheckbox.addEventListener('change', handleFFCheckboxChange);
+    skipCheckbox.addEventListener('change', handleSkipModeCheckboxChange);
 }
 
 injectCheckboxAndInterval();
