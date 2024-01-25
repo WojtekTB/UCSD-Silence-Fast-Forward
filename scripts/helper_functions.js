@@ -1,6 +1,11 @@
 function setPlaybackSpeed(speed) {
-    let videoElement = getVideoElement();
-    videoElement.playbackRate = speed;
+  let videoElement = getVideoElement();
+  videoElement.playbackRate = speed;
+}
+
+function getPlaybackSpeed() {
+  let videoElement = getVideoElement();
+  return videoElement.playbackRate;
 }
 
 function fetchTextContent(url) {
