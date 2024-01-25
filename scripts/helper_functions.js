@@ -59,8 +59,8 @@ function parseCaptionString(captionString) {
     // Check if there's a match
     if (match) {
       const captionNumber = match[1];
-      const startTime = removeAfterFirstComma(match[2]);
-      const endTime = removeAfterFirstComma(match[3]);
+      const startTime = timeStampToSeconds(removeAfterFirstComma(match[2]));
+      const endTime = timeStampToSeconds(removeAfterFirstComma(match[3]));
       const captionText = match[4].replace(/\n/g, ' '); // Replace \n with spaces
   
       return {
@@ -84,32 +84,63 @@ function getVideoElement(){
     return document.ff_downtime_video_element;
 }
 
-async function getVideoCaptions() {
-    if(!document.ff_downtime_captions){
-        const video = getVideoElement();
-        
-        if (!video) {
-            console.error(`Video element with ID '${videoId}' not found.`);
-            return [];
-        }
-        const videoTrack = video.getElementsByTagName("track")[0];
-        if (!videoTrack || !videoTrack.src) {
-            console.error(`Video element with ID '${videoId}' has no track.`);
-            return [];
-        }
-        
-        const videoCaptionURL = videoTrack.src;
-        
-        const captionText = await fetchTextContent(videoCaptionURL);
-        const splitCaptions = captionText.split("\n\n");
-        const captionObjs = [];
-        splitCaptions.forEach(caption => captionObjs.push(parseCaptionString(caption)));
-        document.ff_downtime_captions = captionObjs;
-    }
+function getVideoCaptions() {
     return document.ff_downtime_captions;
 }
 
+async function pullVideoCaptions(){
+  if(!document.ff_downtime_captions){
+    const video = getVideoElement();
+    
+    if (!video) {
+        console.error(`Video element with ID '${videoId}' not found.`);
+        return [];
+    }
+    const videoTrack = video.getElementsByTagName("track")[0];
+    if (!videoTrack || !videoTrack.src) {
+        console.error(`Video element with ID '${videoId}' has no track.`);
+        return [];
+    }
+    
+    const videoCaptionURL = videoTrack.src;
+    
+    const captionText = await fetchTextContent(videoCaptionURL);
+    const splitCaptions = captionText.split("\n\n");
+    const captionObjs = [];
+    splitCaptions.forEach(caption => captionObjs.push(parseCaptionString(caption)));
+    document.ff_downtime_captions = captionObjs;
+    console.log("defined video captions")
+  }
+}
+
 function findCaptionByTime(captions, targetTime) {
+  let low = 0;
+  let high = captions.length - 1;
+
+  while (low <= high) {
+    const mid = Math.floor((low + high) / 2);
+    const currentCaption = captions[mid];
+
+    const startTime = currentCaption.startTime;
+    const endTime = currentCaption.endTime;
+
+    if (startTime <= targetTime && targetTime <= endTime) {
+      // The target time is within the current caption's time range
+      return currentCaption;
+    } else if (targetTime < startTime) {
+      // The target time is before the current caption
+      high = mid - 1;
+    } else {
+      // The target time is after the current caption
+      low = mid + 1;
+    }
+  }
+
+  // If no matching caption is found
+  return null;
+}
+
+function getCurrentCaptionIndex(captions, targetTime) {
     let low = 0;
     let high = captions.length - 1;
   
@@ -117,12 +148,12 @@ function findCaptionByTime(captions, targetTime) {
       const mid = Math.floor((low + high) / 2);
       const currentCaption = captions[mid];
   
-      const startTime = timeStampToSeconds(currentCaption.startTime);
-      const endTime = timeStampToSeconds(currentCaption.endTime);
+      const startTime = currentCaption.startTime;
+      const endTime = currentCaption.endTime;
   
       if (startTime <= targetTime && targetTime <= endTime) {
         // The target time is within the current caption's time range
-        return currentCaption;
+        return mid;
       } else if (targetTime < startTime) {
         // The target time is before the current caption
         high = mid - 1;
@@ -133,22 +164,22 @@ function findCaptionByTime(captions, targetTime) {
     }
   
     // If no matching caption is found
-    return null;
+    return low;
   }
-  async function getCaptionsInRange(startTime, endTime) {
-    const captions = await getVideoCaptions();
+function getCaptionsInRange(startTime, endTime) {
+    const captions = getVideoCaptions();
     let startSeconds = startTime;
     let endSeconds = endTime;
     if(typeof(startTime) === "string"){
         // Convert start and end times to seconds
-        startSeconds = timeStampToSeconds(startTime);
-        endSeconds = timeStampToSeconds(endTime);
+        startSeconds = startTime;
+        endSeconds = endTime;
     }
   
     // Filter captions based on the time range
     const captionsInRange = captions.filter(caption => {
-      const captionStartTime = timeStampToSeconds(caption.startTime);
-      const captionEndTime = timeStampToSeconds(caption.endTime);
+      const captionStartTime = caption.startTime;
+      const captionEndTime = caption.endTime;
       return captionStartTime >= startSeconds && captionEndTime <= endSeconds;
     });
   
@@ -167,10 +198,10 @@ function findCaptionByTime(captions, targetTime) {
     }
 }
 
-async function getCurrentCaption(margin = -1){
+function getCurrentCaption(margin = -1){
     const currentTime = getVideoElement().currentTime;
     if(margin == -1){
         return getCaptionsInRange(Math.max(currentTime-margin, 0), currentTime+margin);
     }
-    return findCaptionByTime(await getVideoCaptions(), currentTime);
+    return findCaptionByTime(getVideoCaptions(), currentTime);
 }
