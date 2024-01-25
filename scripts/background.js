@@ -8,3 +8,9 @@ async function onClicked(){
     });
 }
 
+chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+    console.log(message);
+    if (message.action === 'updateValues') {
+        updateValuesOnPage(message.skipSpeedValue, message.normalSpeedValue);
+    }
+});
