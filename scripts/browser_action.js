@@ -31,28 +31,11 @@ async function tryFF(){
         document.videoFastForwardTimeout = setTimeout(setNormSpeed, ((timeToSkipTo - getVideoElement().currentTime) * 1000)/document.FAST_SPEED);
         // console.log(timeToSkipTo - getVideoElement().currentTime);
     }
-
-    // const currentCaption = await getCurrentCaption(2);
-    // if(currentCaption === null){
-    //     setFastSpeed();
-    //     clearInterval(document.checkForFastForwardInterval);
-    //     // set interval to wait for subtitles
-    //     document.waitingForSubtitlesInterval = setInterval(()=>{
-    //         const k = document.getElementById("kaltura_player_ifp");
-    //         const subtitlesElement = k.contentDocument.getElementsByClassName("track")[0];
-    //         if(subtitlesElement != null){
-    //             clearInterval = document.waitingForSubtitlesInterval
-    //             setNormSpeed();
-    //             if (document.getElementById("skipSilenceCheckbox").checked) {
-    //                 document.checkForFastForwardInterval = setInterval(tryFF, 100);
-    //             } 
-    //         }
-    //     }, 1);
-    // }
 }
 
 function setFastSpeed(){
     if(!document.isFastSpeed){
+        document.NORM_SPEED = getPlaybackSpeed();
         setPlaybackSpeed(document.FAST_SPEED);
         console.log("Switched to fast speed.");
         document.isFastSpeed = true;
@@ -85,9 +68,12 @@ function injectCheckboxAndInterval() {
 
     function handleCheckboxChange() {
         if (checkbox.checked) {
-            document.checkForFastForwardInterval = setInterval(tryFF, 500);
+            document.checkForFastForwardInterval = setInterval(tryFF, 100);
+            setNormSpeed();
+            console.log(getVideoElement());
         } else {
             clearInterval(document.checkForFastForwardInterval);
+            clearTimeout(document.videoFastForwardTimeout);
         }
     }
 
@@ -101,11 +87,6 @@ chrome.storage.sync.get(['skipSpeed', 'normalSpeed'], function (result) {
     updateValuesOnPage(result.skipSpeed, result.normalSpeed);
 });
 
-chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-    if (message.action === 'updateValues') {
-        updateValuesOnPage(message.skipSpeedValue, message.normalSpeedValue);
-    }
-});
 
 function updateValuesOnPage(skipSpeed, normalSpeed) {
     const skipSpeedValue = skipSpeed !== undefined ? skipSpeed : '15';
@@ -119,7 +100,7 @@ function updateValuesOnPage(skipSpeed, normalSpeed) {
 }
 didAddSeekedEvent = false;
 getCaptionsInterval = setInterval(()=>{
-    if(getVideoCaptions()){
+    if(!!getVideoElement() && !!getVideoCaptions() && didAddSeekedEvent){
         clearInterval(getCaptionsInterval);
     }
     pullVideoCaptions();
