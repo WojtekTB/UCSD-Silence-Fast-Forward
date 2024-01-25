@@ -71,18 +71,38 @@ function injectCheckboxAndInterval() {
 
     const skipCheckbox = document.createElement('input');
     skipCheckbox.type = 'checkbox';
-    skipCheckbox.id = 'ffSilenceCheckbox';
+    skipCheckbox.id = 'skipSilenceCheckbox';
 
     const skipLabel = document.createElement('label');
     skipLabel.htmlFor = 'skipSilenceCheckbox';
-    skipLabel.textContent = 'Skip Silence';
+    skipLabel.textContent = 'Skip Silence  ';
 
+    const extensionNameLabel = document.createElement('label');
+    extensionNameLabel.textContent = '| GYT Controls:  ';
+    extensionNameLabel.style.fontWeight = 'bold';
+
+    const donateButton = document.createElement('button');
+    donateButton.innerHTML = '❤️ Donate';
+    donateButton.style.backgroundColor = '#ff69b4';  // Set background color
+    donateButton.style.color = '#ffffff';  // Set text color
+    donateButton.style.border = 'none';  // Remove border
+    donateButton.style.padding = '2px 4px';  // Add padding
+    donateButton.style.borderRadius = '5px';  // Add rounded corners
+    donateButton.style.cursor = 'pointer';  // Change cursor on hover
+    donateButton.addEventListener('click', function() {
+        window.open('https://www.buymeacoffee.com/17victork');
+    });
+
+    actionLinksUl.appendChild(extensionNameLabel);
+    
     actionLinksUl.appendChild(ffCheckbox);
     actionLinksUl.appendChild(label);
-
+    
     actionLinksUl.appendChild(skipCheckbox);
     actionLinksUl.appendChild(skipLabel);
     
+    actionLinksUl.appendChild(donateButton);
+
     function enableSilenceDetection(checked){
         if (checked) {
             document.checkForFastForwardInterval = setInterval(tryFF, 100);

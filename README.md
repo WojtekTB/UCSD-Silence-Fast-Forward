@@ -1,7 +1,6 @@
-# UCSD-Schedule-Visualizer
+# UCSD Get-To-Yapping (GYP)
   
-Extension that creates a timetable of your WebReg classes and shows you where the class you are hovering over would fit in your schedule. This uses timetable.js. It also allows you to quickly generate a google maps route of your classes.  
-The code is pretty jank, but if you want to fix that make a PR :)  
+Browser extension that fast-forwards or skips UCSD podcasts when it detects scilence, reducing the amount of time you are waiting for the professor to talk.
 
 <img width="1439" alt="Screen Shot 2022-12-17 at 5 36 36 PM" src="https://user-images.githubusercontent.com/34536619/208273354-9537f582-fc3f-483c-99ee-8d3ae8581bdb.png">
 
@@ -20,5 +19,5 @@ How to install manually:
 
 
 ## Optional Donation
-https://www.buymeacoffee.com/17victork
+https://www.buymeacoffee.com/17victork  
 Donate a cup of coffee if you liked the extension.
