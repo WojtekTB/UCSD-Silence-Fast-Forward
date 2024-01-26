@@ -1,7 +1,7 @@
 {
     "name": "UCSD Get To Yapping",
     "description": "Help skip scilence in UCSD podcasts.",
-    "version": "0.1",
+    "version": "0.2",
     "icons":{"128":"ucsd-icon-128.png"},
     "action": {
       "default_popup": "popup.html"
