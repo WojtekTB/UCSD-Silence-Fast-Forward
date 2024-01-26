@@ -6,7 +6,7 @@ Browser extension that fast-forwards or skips UCSD podcasts when it detects scil
 
 ## Chrome Store
 
-  If you use Google chrome, Opera, Brave, Microsoft edge, or most other chromium based browsers you are likely able to just install the extension from google's web store: https://chrome.google.com/webstore/detail/ucsd-schedule-visualizer/jkaheldanccinoefddienccoblmcmhgn/related?hl=en&authuser=0
+  If you use Google chrome, Opera, Brave, Microsoft edge, or most other chromium based browsers you are likely able to just install the extension from google's web store: https://chromewebstore.google.com/detail/ucsd-get-to-yapping/hhambeeokedhfflpgbkcbobiadfbmbfp?hl=en
   
 ## How to install without Chrome Store
 How to install manually:  
