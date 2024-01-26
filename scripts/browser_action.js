@@ -16,10 +16,9 @@ async function tryFF(){
         document.lastCaptionIndex++;
     }
 
-    // console.log(document.ff_downtime_captions[document.lastCaptionIndex], getVideoElement().currentTime);
     const timeUntilNextCaption = document.ff_downtime_captions[document.lastCaptionIndex].startTime - getVideoElement().currentTime;
     const timeSinceLastSubtitle = document.lastCaptionIndex > 0 ? getVideoElement().currentTime-document.ff_downtime_captions[document.lastCaptionIndex-1].endTime:999;
-    // console.log(`Diff to next caption: ${timeUntilNextCaption}. Time since last: ${timeSinceLastSubtitle}`);
+
 
     if(timeUntilNextCaption > 2 && timeSinceLastSubtitle > 0.2){
         // ff to next time
@@ -38,9 +37,9 @@ async function tryFF(){
 
 function setFastSpeed(){
     if(!document.isFastSpeed){
+        // console.log("Switched to fast speed.");
         document.NORM_SPEED = getPlaybackSpeed();
         setPlaybackSpeed(document.FAST_SPEED);
-        console.log("Switched to fast speed.");
         document.isFastSpeed = true;
         document.fastforwardImage.hidden = false;
     }
@@ -48,8 +47,8 @@ function setFastSpeed(){
 
 function setNormSpeed(){
     if(document.isFastSpeed){
+        // console.log("Switched to normal speed.");
         setPlaybackSpeed(document.NORM_SPEED);
-        console.log("Switched to normal speed.");
         document.isFastSpeed = false;
         document.fastforwardImage.hidden = true;
     }
@@ -107,7 +106,6 @@ function injectCheckboxAndInterval() {
         if (checked) {
             document.checkForFastForwardInterval = setInterval(tryFF, 100);
             setNormSpeed();
-            console.log(getVideoElement());
         } else {
             clearInterval(document.checkForFastForwardInterval);
             clearTimeout(document.videoFastForwardTimeout);
@@ -132,9 +130,6 @@ function injectCheckboxAndInterval() {
     skipCheckbox.addEventListener('change', handleSkipModeCheckboxChange);
 }
 
-injectCheckboxAndInterval();
-
-
 chrome.storage.sync.get(['skipSpeed', 'normalSpeed'], function (result) {
     updateValuesOnPage(result.skipSpeed, result.normalSpeed);
 });
@@ -145,8 +140,8 @@ function updateValuesOnPage(skipSpeed, normalSpeed) {
     const normalSpeedValue = normalSpeed !== undefined ? normalSpeed : '1';
 
     // Now you can use skipSpeedValue and normalSpeedValue as needed
-    console.log('Skip Speed:', skipSpeedValue);
-    console.log('Normal Speed:', normalSpeedValue);
+    // console.log('Skip Speed:', skipSpeedValue);
+    // console.log('Normal Speed:', normalSpeedValue);
     document.FAST_SPEED = skipSpeedValue;
     document.NORM_SPEED = normalSpeedValue;
 }
@@ -155,16 +150,14 @@ getCaptionsInterval = setInterval(()=>{
     if(!!getVideoElement() && !!getVideoCaptions() && didAddSeekedEvent){
         clearInterval(getCaptionsInterval);
     }
-    pullVideoCaptions();
 
     if(getVideoElement() && !didAddSeekedEvent){
         didAddSeekedEvent = true;
+        injectCheckboxAndInterval();
         getVideoElement().addEventListener("seeked", ()=>{
             document.lastCaptionIndex = getCurrentCaptionIndex(getVideoCaptions(), getVideoElement().currentTime);
-            console.log("caption update");
             clearTimeout(document.videoFastForwardTimeout);
             setNormSpeed();
-
 
             document.fastforwardImage = document.createElement('img');
             document.fastforwardImage.src = 'https://i.imgur.com/cjNYz43.png';
@@ -178,6 +171,9 @@ getCaptionsInterval = setInterval(()=>{
             getVideoElement().parentNode.appendChild(document.fastforwardImage);
         }
         );
+    }
+    if(!getVideoCaptions()){
+        pullVideoCaptions();
     }
 }, 100);
 
