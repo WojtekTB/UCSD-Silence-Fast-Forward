@@ -77,7 +77,7 @@ function injectCheckboxAndInterval() {
     skipLabel.textContent = 'Skip Silence  ';
 
     const extensionNameLabel = document.createElement('label');
-    extensionNameLabel.textContent = '| GYT Controls:  ';
+    extensionNameLabel.textContent = '| UCSD SFF Controls:  ';
     extensionNameLabel.style.fontWeight = 'bold';
 
     const donateButton = document.createElement('button');

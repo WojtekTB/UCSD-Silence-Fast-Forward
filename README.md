@@ -1,4 +1,4 @@
-# UCSD Get-To-Yapping (GYP)
+# UCSD Silence Fast-Forward (SFF)
   
 Browser extension that fast-forwards or skips UCSD podcasts when it detects scilence, reducing the amount of time you are waiting for the professor to talk.
 
