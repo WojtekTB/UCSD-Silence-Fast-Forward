@@ -1,5 +1,5 @@
 {
-    "name": "UCSD silence Fast-Forward",
+    "name": "UCSD Silence Fast-Forward",
     "description": "Help skip silence in UCSD podcasts.",
     "version": "0.2",
     "icons":{"128":"ucsd-icon-128.png"},
