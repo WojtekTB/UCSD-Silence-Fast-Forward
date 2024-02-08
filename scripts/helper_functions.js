@@ -87,6 +87,15 @@ function getVideoElement(){
         document.ff_downtime_video_element = k.contentDocument.getElementById(videoId);
     }
     return document.ff_downtime_video_element;
+    }
+    
+function getVideoSeekBarElement(){
+  if(!document.ff_downtime_video_seek_bar_element){
+    const k = document.getElementById("kaltura_player_ifp");
+    const sliderContainer = k.contentDocument.getElementsByClassName('controlBarContainer')[0];
+    document.ff_downtime_video_seek_bar_element = sliderContainer.querySelectorAll('[role="slider"]')[0];
+  }
+  return document.ff_downtime_video_seek_bar_element;
 }
 
 function getVideoCaptions() {
