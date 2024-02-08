@@ -1,7 +1,7 @@
 {
     "name": "UCSD Silence Fast-Forward",
     "description": "Help skip silence in UCSD podcasts.",
-    "version": "0.2",
+    "version": "0.3",
     "icons":{"128":"ucsd-icon-128.png"},
     "action": {
       "default_popup": "popup.html"
