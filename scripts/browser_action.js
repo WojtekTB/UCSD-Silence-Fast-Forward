@@ -21,7 +21,6 @@ async function tryFF(){
     const timeUntilNextCaption = document.ff_downtime_captions[document.lastCaptionIndex].startTime - getVideoElement().currentTime;
     const timeSinceLastSubtitle = document.lastCaptionIndex > 0 ? getVideoElement().currentTime-document.ff_downtime_captions[document.lastCaptionIndex-1].endTime:999;
 
-
     if(
         timeUntilNextCaption > document.MIN_SKIP_TIME_UNTIL_NEXT_CAPTION && 
         timeSinceLastSubtitle > document.START_SKIP_PADDING_TIME
@@ -177,8 +176,6 @@ function updateValuesOnPage(skipSpeed, normalSpeed) {
     const normalSpeedValue = normalSpeed !== undefined ? normalSpeed : '1';
 
     // Now you can use skipSpeedValue and normalSpeedValue as needed
-    // console.log('Skip Speed:', skipSpeedValue);
-    // console.log('Normal Speed:', normalSpeedValue);
     document.FAST_SPEED = skipSpeedValue;
     document.NORM_SPEED = normalSpeedValue;
 }
@@ -214,4 +211,3 @@ getCaptionsInterval = setInterval(()=>{
         pullVideoCaptions();
     }
 }, 100);
-
