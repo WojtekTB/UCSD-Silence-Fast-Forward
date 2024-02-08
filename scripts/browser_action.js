@@ -1,7 +1,9 @@
 
 document.FAST_SPEED = 15;
 document.NORM_SPEED = 2;
-
+document.MIN_SKIP_TIME_UNTIL_NEXT_CAPTION = 2; // minimum length of silence until it is skipped
+document.START_SKIP_PADDING_TIME = 0.2; // padding to give until the skipping begins
+document.END_SKIP_PADDING_TIME = 0.1; // padding to give until the skipping ends
 
 async function tryFF(){
     if(document.isFastSpeed){
@@ -20,9 +22,12 @@ async function tryFF(){
     const timeSinceLastSubtitle = document.lastCaptionIndex > 0 ? getVideoElement().currentTime-document.ff_downtime_captions[document.lastCaptionIndex-1].endTime:999;
 
 
-    if(timeUntilNextCaption > 2 && timeSinceLastSubtitle > 0.2){
+    if(
+        timeUntilNextCaption > document.MIN_SKIP_TIME_UNTIL_NEXT_CAPTION && 
+        timeSinceLastSubtitle > document.START_SKIP_PADDING_TIME
+        ){
         // ff to next time
-        const timeToSkipTo = document.ff_downtime_captions[document.lastCaptionIndex].startTime - 0.1;
+        const timeToSkipTo = document.ff_downtime_captions[document.lastCaptionIndex].startTime - document.END_SKIP_PADDING_TIME;
         
         if(document.skipSilenceMode){
             // skip to time
