@@ -184,11 +184,12 @@ function updateValuesOnPage(skipSpeed, normalSpeed) {
 }
 didAddSeekedEvent = false;
 getCaptionsInterval = setInterval(()=>{
-    if(!!getVideoElement() && !!getVideoCaptions() && didAddSeekedEvent){
+    if(!!getVideoElement() && !!getVideoCaptions() && didAddSeekedEvent && !isNaN(getVideoElement().duration)){
+        generateSkipPeriodsVisualization();
         clearInterval(getCaptionsInterval);
     }
 
-    if(getVideoElement() && !didAddSeekedEvent){
+    if(!!getVideoElement() && !didAddSeekedEvent){
         didAddSeekedEvent = true;
         injectCheckboxAndInterval();
         getVideoElement().addEventListener("seeked", ()=>{
