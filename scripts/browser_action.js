@@ -1,8 +1,8 @@
 
 document.FAST_SPEED = 15;
 document.NORM_SPEED = 2;
-document.MIN_SKIP_TIME_UNTIL_NEXT_CAPTION = 2; // minimum length of silence until it is skipped
-document.START_SKIP_PADDING_TIME = 0.2; // padding to give until the skipping begins
+document.MIN_SKIP_TIME_UNTIL_NEXT_CAPTION = 1; // minimum length of silence until it is skipped
+document.START_SKIP_PADDING_TIME = 0.1; // padding to give until the skipping begins
 document.END_SKIP_PADDING_TIME = 0.1; // padding to give until the skipping ends
 
 async function tryFF(){
