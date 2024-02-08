@@ -40,6 +40,22 @@ async function tryFF(){
     }
 }
 
+function addRedRectangle(div, percentStart, percentEnd) {
+    const redRectangle = document.createElement('div');
+    redRectangle.style.position = 'absolute';
+    redRectangle.style.top = '0';
+    redRectangle.style.left = `${percentStart*100}%`;
+    redRectangle.style.height = '100%';
+    redRectangle.style.backgroundColor = 'rgba(100, 0, 0, 30)';
+    redRectangle.style.zIndex = '99'; // right under bubble
+    redRectangle.style.width = `${(percentEnd-percentStart)*100}%`;
+    
+    // Append the red rectangle to the container div
+    div.appendChild(redRectangle);
+    return redRectangle;//return for future ref
+  }
+
+
 function setFastSpeed(){
     if(!document.isFastSpeed){
         // console.log("Switched to fast speed.");
