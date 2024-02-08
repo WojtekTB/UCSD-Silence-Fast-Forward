@@ -55,6 +55,22 @@ function addRedRectangle(div, percentStart, percentEnd) {
     return redRectangle;//return for future ref
   }
 
+function generateSkipPeriodsVisualization(){
+    const controlBarElement = getVideoSeekBarElement();
+    const captions = getVideoCaptions();
+    const totalVideoTime = getVideoElement().duration;
+    let prevEndTime = 0;
+    for(let i = 0; i < captions.length; i++){
+        const diffToNextCaption = captions[i].startTime - prevEndTime;
+        if(diffToNextCaption > document.MIN_SKIP_TIME_UNTIL_NEXT_CAPTION){
+            // if will be skipped
+            addRedRectangle(controlBarElement, prevEndTime/totalVideoTime, captions[i].startTime/totalVideoTime);
+        }
+        prevEndTime = captions[i].endTime;
+    }
+    // handle last caption to end
+    addRedRectangle(controlBarElement, prevEndTime/totalVideoTime, 1);
+}
 
 function setFastSpeed(){
     if(!document.isFastSpeed){
