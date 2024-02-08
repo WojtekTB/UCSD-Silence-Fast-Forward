@@ -2,7 +2,7 @@
   
 Browser extension that fast-forwards or skips UCSD podcasts when it detects scilence, reducing the amount of time you are waiting for the professor to talk.
 
-<img width="943" alt="image" src="https://github.com/WojtekTB/UCSD-Get-To-Yapping/assets/34536619/90211321-d5c3-4e35-af45-5ec9ed93ad32">
+<img width="869" alt="image" src="https://github.com/WojtekTB/UCSD-Get-To-Yapping/assets/34536619/7909313a-d454-4375-95c7-52dc1f6913b5">
 
 ## Chrome Store
 
