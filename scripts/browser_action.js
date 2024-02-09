@@ -42,7 +42,7 @@ async function tryFF(){
         timeSinceLastSubtitle > document.START_SKIP_PADDING_TIME
         ){
         // ff to next time
-        const timeToSkipTo = document.ff_downtime_captions[document.lastCaptionIndex].startTime - document.END_SKIP_PADDING_TIME;
+        const timeToSkipTo = currentIndexCaption.startTime;
         
         skipUntilTime(timeToSkipTo);
     }
@@ -51,11 +51,11 @@ async function tryFF(){
 function skipUntilTime(timeToSkipTo){
     if(document.skipSilenceMode){
         // skip to time
-        getVideoElement().currentTime = timeToSkipTo;
+        getVideoElement().currentTime = timeToSkipTo - document.END_SKIP_PADDING_TIME;
     }
     else{
         setFastSpeed();
-        document.videoFastForwardTimeout = setTimeout(setNormSpeed, ((timeToSkipTo - getVideoElement().currentTime) * 1000)/document.FAST_SPEED);
+        document.videoFastForwardTimeout = setTimeout(setNormSpeed, ((timeToSkipTo - document.END_SKIP_PADDING_TIME - getVideoElement().currentTime) * 1000)/document.FAST_SPEED);
     }
 }
 
