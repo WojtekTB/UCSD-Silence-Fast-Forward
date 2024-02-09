@@ -9,33 +9,70 @@ async function tryFF(){
     if(document.isFastSpeed){
         return;
     }
-    if(!document.lastCaptionIndex){
+
+    if(!document.lastCaptionIndex && document.lastCaptionIndex !== 0){
         document.lastCaptionIndex = 0;
+        return;
     }
+    const currentTime = getVideoElement().currentTime;
+    const videoDuration = getVideoElement().duration;
+    const currentIndexCaption = document.ff_downtime_captions[document.lastCaptionIndex];
+    const lastCaption = document.ff_downtime_captions[document.lastCaptionIndex-1];
     
-    if(document.ff_downtime_captions[document.lastCaptionIndex].endTime < getVideoElement().currentTime){
-        // need to redefine the index
-        document.lastCaptionIndex++;
+    if(document.ff_downtime_captions.length <= document.lastCaptionIndex){
+        // if past the last caption. Implies silence at the end
+        const timeUntilNextCaption = videoDuration - currentTime;
+        const timeSinceLastSubtitle = currentTime-document.ff_downtime_captions[document.ff_downtime_captions.length - 1].endTime;
+        if(
+            timeUntilNextCaption > document.MIN_SKIP_TIME_UNTIL_NEXT_CAPTION && 
+            timeSinceLastSubtitle > document.START_SKIP_PADDING_TIME
+        ){
+            skipUntilTime(videoDuration);
+        }
+        return;
     }
 
-    const timeUntilNextCaption = document.ff_downtime_captions[document.lastCaptionIndex].startTime - getVideoElement().currentTime;
-    const timeSinceLastSubtitle = document.lastCaptionIndex > 0 ? getVideoElement().currentTime-document.ff_downtime_captions[document.lastCaptionIndex-1].endTime:999;
+    if(document.lastCaptionIndex == 0 && currentTime < currentIndexCaption.startTime){
+        // did not get to the first caption yet. Implies silence at the beginning
+        const timeUntilNextCaption = currentIndexCaption.startTime-currentTime;
+        const timeSinceLastSubtitle = currentTime;
+        if(
+            timeUntilNextCaption > document.MIN_SKIP_TIME_UNTIL_NEXT_CAPTION && 
+            timeSinceLastSubtitle > document.START_SKIP_PADDING_TIME
+        ){
+            skipUntilTime(currentIndexCaption.startTime);
+        }
+        return;
+    }
+    
+    if(currentIndexCaption.endTime < currentTime){
+        // need to redefine the index
+        document.lastCaptionIndex++;
+        return;
+    }
+
+    const timeUntilNextCaption = currentIndexCaption.startTime - currentTime;
+    const timeSinceLastSubtitle = document.lastCaptionIndex > 0 ? currentTime-lastCaption.endTime:999;
 
     if(
         timeUntilNextCaption > document.MIN_SKIP_TIME_UNTIL_NEXT_CAPTION && 
         timeSinceLastSubtitle > document.START_SKIP_PADDING_TIME
         ){
         // ff to next time
-        const timeToSkipTo = document.ff_downtime_captions[document.lastCaptionIndex].startTime - document.END_SKIP_PADDING_TIME;
+        const timeToSkipTo = currentIndexCaption.startTime;
         
-        if(document.skipSilenceMode){
-            // skip to time
-            getVideoElement().currentTime = timeToSkipTo;
-        }
-        else{
-            setFastSpeed();
-            document.videoFastForwardTimeout = setTimeout(setNormSpeed, ((timeToSkipTo - getVideoElement().currentTime) * 1000)/document.FAST_SPEED);
-        }
+        skipUntilTime(timeToSkipTo);
+    }
+}
+
+function skipUntilTime(timeToSkipTo){
+    if(document.skipSilenceMode){
+        // skip to time
+        getVideoElement().currentTime = timeToSkipTo - document.END_SKIP_PADDING_TIME;
+    }
+    else{
+        setFastSpeed();
+        document.videoFastForwardTimeout = setTimeout(setNormSpeed, ((timeToSkipTo - document.END_SKIP_PADDING_TIME - getVideoElement().currentTime) * 1000)/document.FAST_SPEED);
     }
 }
 
