@@ -28,14 +28,18 @@ async function tryFF(){
         // ff to next time
         const timeToSkipTo = document.ff_downtime_captions[document.lastCaptionIndex].startTime - document.END_SKIP_PADDING_TIME;
         
-        if(document.skipSilenceMode){
-            // skip to time
-            getVideoElement().currentTime = timeToSkipTo;
-        }
-        else{
-            setFastSpeed();
-            document.videoFastForwardTimeout = setTimeout(setNormSpeed, ((timeToSkipTo - getVideoElement().currentTime) * 1000)/document.FAST_SPEED);
-        }
+        skipUntilTime(timeToSkipTo);
+    }
+}
+
+function skipUntilTime(timeToSkipTo){
+    if(document.skipSilenceMode){
+        // skip to time
+        getVideoElement().currentTime = timeToSkipTo;
+    }
+    else{
+        setFastSpeed();
+        document.videoFastForwardTimeout = setTimeout(setNormSpeed, ((timeToSkipTo - getVideoElement().currentTime) * 1000)/document.FAST_SPEED);
     }
 }
 
