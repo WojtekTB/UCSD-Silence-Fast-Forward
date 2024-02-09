@@ -11,11 +11,14 @@ async function tryFF(){
     }
     if(!document.lastCaptionIndex){
         document.lastCaptionIndex = 0;
+        return;
+    }
     }
     
     if(document.ff_downtime_captions[document.lastCaptionIndex].endTime < getVideoElement().currentTime){
         // need to redefine the index
         document.lastCaptionIndex++;
+        return;
     }
 
     const timeUntilNextCaption = document.ff_downtime_captions[document.lastCaptionIndex].startTime - getVideoElement().currentTime;
