@@ -13,6 +13,10 @@ async function tryFF(){
         document.lastCaptionIndex = 0;
         return;
     }
+    const currentTime = getVideoElement().currentTime;
+    const videoDuration = getVideoElement().duration;
+    const currentIndexCaption = document.ff_downtime_captions[document.lastCaptionIndex];
+    const lastCaption = document.ff_downtime_captions[document.lastCaptionIndex-1];
     
     if(document.ff_downtime_captions.length <= document.lastCaptionIndex){
         // if past the last caption. Implies silence at the end
@@ -23,19 +27,19 @@ async function tryFF(){
             timeUntilNextCaption > document.MIN_SKIP_TIME_UNTIL_NEXT_CAPTION && 
             timeSinceLastSubtitle > document.START_SKIP_PADDING_TIME
         ){
-            skipUntilTime(getVideoElement().duration);
+            skipUntilTime(currentIndexCaption.startTime);
         }
         return;
     }
     
-    if(document.ff_downtime_captions[document.lastCaptionIndex].endTime < getVideoElement().currentTime){
+    if(currentIndexCaption.endTime < currentTime){
         // need to redefine the index
         document.lastCaptionIndex++;
         return;
     }
 
-    const timeUntilNextCaption = document.ff_downtime_captions[document.lastCaptionIndex].startTime - getVideoElement().currentTime;
-    const timeSinceLastSubtitle = document.lastCaptionIndex > 0 ? getVideoElement().currentTime-document.ff_downtime_captions[document.lastCaptionIndex-1].endTime:999;
+    const timeUntilNextCaption = currentIndexCaption.startTime - currentTime;
+    const timeSinceLastSubtitle = document.lastCaptionIndex > 0 ? currentTime-lastCaption.endTime:999;
 
     if(
         timeUntilNextCaption > document.MIN_SKIP_TIME_UNTIL_NEXT_CAPTION && 
