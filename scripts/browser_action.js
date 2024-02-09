@@ -13,6 +13,19 @@ async function tryFF(){
         document.lastCaptionIndex = 0;
         return;
     }
+    
+    if(document.ff_downtime_captions.length <= document.lastCaptionIndex){
+        // if past the last caption. Implies silence at the end
+        // set your own separate corner case interval
+        const timeUntilNextCaption = getVideoElement().duration - getVideoElement().currentTime;
+        const timeSinceLastSubtitle = getVideoElement().currentTime-document.ff_downtime_captions[document.ff_downtime_captions.length - 1].endTime;
+        if(
+            timeUntilNextCaption > document.MIN_SKIP_TIME_UNTIL_NEXT_CAPTION && 
+            timeSinceLastSubtitle > document.START_SKIP_PADDING_TIME
+        ){
+            skipUntilTime(getVideoElement().duration);
+        }
+        return;
     }
     
     if(document.ff_downtime_captions[document.lastCaptionIndex].endTime < getVideoElement().currentTime){
