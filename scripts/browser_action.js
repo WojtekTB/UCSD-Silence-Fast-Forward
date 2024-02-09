@@ -9,7 +9,8 @@ async function tryFF(){
     if(document.isFastSpeed){
         return;
     }
-    if(!document.lastCaptionIndex){
+
+    if(!document.lastCaptionIndex && document.lastCaptionIndex !== 0){
         document.lastCaptionIndex = 0;
         return;
     }
