@@ -5,6 +5,8 @@ document.MIN_SKIP_TIME_UNTIL_NEXT_CAPTION = 1; // minimum length of silence unti
 document.START_SKIP_PADDING_TIME = 0.1; // padding to give until the skipping begins
 document.END_SKIP_PADDING_TIME = 0.1; // padding to give until the skipping ends
 
+document.SECONDS_SAVED = 0;
+
 async function tryFF(){
     if(document.isFastSpeed){
         return;
@@ -68,6 +70,8 @@ async function tryFF(){
 function skipUntilTime(timeToSkipTo){
     if(document.skipSilenceMode){
         // skip to time
+        document.SECONDS_SAVED += (timeToSkipTo - document.END_SKIP_PADDING_TIME) - getVideoElement().currentTime;
+        document.secondsSavedCounterLabel.textContent = Math.floor(document.SECONDS_SAVED/1000);
         getVideoElement().currentTime = timeToSkipTo - document.END_SKIP_PADDING_TIME;
     }
     else{
@@ -111,6 +115,10 @@ function generateSkipPeriodsVisualization(){
 function setFastSpeed(){
     if(!document.isFastSpeed){
         // console.log("Switched to fast speed.");
+
+        // save when the fast speed was started
+        fastSpeedStartedTime = new Date().getTime();
+
         document.NORM_SPEED = getPlaybackSpeed();
         setPlaybackSpeed(document.FAST_SPEED);
         document.isFastSpeed = true;
@@ -121,6 +129,12 @@ function setFastSpeed(){
 function setNormSpeed(){
     if(document.isFastSpeed){
         // console.log("Switched to normal speed.");
+
+        // save when the fast speed was started
+        document.SECONDS_SAVED += (new Date().getTime() - fastSpeedStartedTime) * document.FAST_SPEED;
+        document.secondsSavedCounterLabel.textContent = Math.floor(document.SECONDS_SAVED/1000);
+        fastSpeedStartedTime = null;
+
         setPlaybackSpeed(document.NORM_SPEED);
         document.isFastSpeed = false;
         document.fastforwardImage.hidden = true;
@@ -136,6 +150,7 @@ function injectCheckboxAndInterval() {
     const label = document.createElement('label');
     label.htmlFor = 'ffSilenceCheckbox';
     label.textContent = 'Fast-Forward Silence  ';
+    label.style.fontWeight = 'bold';
 
     actionLinksUl.appendChild(ffCheckbox);
     actionLinksUl.appendChild(label);
@@ -148,11 +163,12 @@ function injectCheckboxAndInterval() {
     const skipLabel = document.createElement('label');
     skipLabel.htmlFor = 'skipSilenceCheckbox';
     skipLabel.textContent = 'Skip Silence  ';
+    skipLabel.style.fontWeight = 'bold';
 
     const extensionNameLabel = document.createElement('label');
     extensionNameLabel.textContent = '| UCSD SFF Controls:  ';
     extensionNameLabel.style.fontWeight = 'bold';
-
+    
     const donateButton = document.createElement('button');
     donateButton.innerHTML = '❤️ Donate';
     donateButton.style.backgroundColor = '#ff69b4';  // Set background color
@@ -161,9 +177,18 @@ function injectCheckboxAndInterval() {
     donateButton.style.padding = '2px 4px';  // Add padding
     donateButton.style.borderRadius = '5px';  // Add rounded corners
     donateButton.style.cursor = 'pointer';  // Change cursor on hover
+    donateButton.style.marginLeft = '5px';
     donateButton.addEventListener('click', function() {
         window.open('https://www.buymeacoffee.com/17victork');
     });
+
+    const secondsSavedLabel = document.createElement('label');
+    secondsSavedLabel.textContent = ` | Seconds saved: `;
+    secondsSavedLabel.style.fontWeight = 'bold';
+
+    document.secondsSavedCounterLabel = document.createElement('label');
+    document.secondsSavedCounterLabel.textContent = `0`;
+    document.secondsSavedCounterLabel.style.fontWeight = 'bold';
 
     actionLinksUl.appendChild(extensionNameLabel);
     
@@ -173,6 +198,9 @@ function injectCheckboxAndInterval() {
     actionLinksUl.appendChild(skipCheckbox);
     actionLinksUl.appendChild(skipLabel);
     
+    actionLinksUl.appendChild(secondsSavedLabel);
+    actionLinksUl.appendChild(document.secondsSavedCounterLabel);
+
     actionLinksUl.appendChild(donateButton);
 
     function enableSilenceDetection(checked){
