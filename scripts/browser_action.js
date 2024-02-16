@@ -218,6 +218,7 @@ function injectCheckboxAndInterval() {
         skipCheckbox.checked = false;
         setNormSpeed();
         enableSilenceDetection(ffCheckbox.checked);
+        showRatingWindow();
     }
 
     function handleSkipModeCheckboxChange(){
@@ -225,6 +226,7 @@ function injectCheckboxAndInterval() {
         ffCheckbox.checked = false;
         setNormSpeed();
         enableSilenceDetection(skipCheckbox.checked);
+        showRatingWindow();
     }
 
     ffCheckbox.addEventListener('change', handleFFCheckboxChange);

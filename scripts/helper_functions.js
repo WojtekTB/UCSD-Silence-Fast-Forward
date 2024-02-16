@@ -219,3 +219,62 @@ function getCurrentCaption(margin = -1){
     }
     return findCaptionByTime(getVideoCaptions(), currentTime);
 }
+
+function showRatingWindow() {
+  if(localStorage.getItem('extensionRatingWindowClosed') === null){
+      localStorage.setItem('extensionRatingWindowClosed', (Math.random() * 4)+5);
+  }
+  if (localStorage.getItem('extensionRatingWindowClosed') > 0) {
+      localStorage.setItem('extensionRatingWindowClosed', localStorage.getItem('extensionRatingWindowClosed')-1);
+      return; // If so, do not show the rating window again
+  }
+  if(document.getElementById("ratingWindow")){
+    // if already showing it
+    return;
+  }
+  // Create a div element for the rating window
+  const ratingWindow = document.createElement('div');
+  ratingWindow.style.position = 'fixed';
+  ratingWindow.style.top = '40px'; // Adjust the top position as needed
+  ratingWindow.style.right = '10px'; // Adjust the right position as needed
+  ratingWindow.style.width = '30vw';
+  ratingWindow.style.backgroundColor = '#fff';
+  ratingWindow.style.padding = '20px';
+  ratingWindow.style.border = '1px solid #ccc';
+  ratingWindow.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
+  ratingWindow.style.textAlign = 'center';
+  ratingWindow.style.zIndex = 99999;
+  ratingWindow.id = 'ratingWindow';
+  ratingWindow.innerHTML = `
+      <div style="display: inline-block; text-align: center;">
+      <p>Hey!</p>
+      <p>My name is Victor. I am a college student who made the UCSD Podcast Silence Fast-Forward extension! </p>
+      <p>I made it on my own time entirely for free.</p>
+      <p>I would really appreciate it if you could rate it on google chrome store, or could share it with your classmates!</p>
+      <p>It would help me and my work a lot!</p>
+          <div style="display: inline-block; text-align: left;">
+              <p>Thank you!</p>
+          </div>
+      </div>
+    <button id="rateButton" style="padding: 10px 20px; background-color: #4CAF50; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Rate Now</button>
+    <button id="dismissButton" style="margin-left: 10px; padding: 10px 20px; background-color: #ccc; color: #333; border: none; border-radius: 5px; cursor: pointer;">Dismiss</button>
+  `;
+
+  // Append the rating window to the body
+  document.body.appendChild(ratingWindow);
+
+  // Add event listeners to the rate and dismiss buttons
+  document.getElementById('rateButton').addEventListener('click', function() {
+    // Open the Chrome Web Store page for your extension where users can leave a review
+    window.open('https://chromewebstore.google.com/detail/ucsd-podcast-silence-fast/hhambeeokedhfflpgbkcbobiadfbmbfp/reviews', '_blank');
+    // You should replace 'your-extension-id' with the actual ID of your extension
+    ratingWindow.remove(); // Remove the rating window after opening the review page
+    localStorage.setItem('extensionRatingWindowClosed', Infinity);
+  });
+
+  document.getElementById('dismissButton').addEventListener('click', function() {
+    // Dismiss the window without taking any action
+    ratingWindow.remove();
+    localStorage.setItem('extensionRatingWindowClosed', 10+Math.random() * 10);
+  });
+}
