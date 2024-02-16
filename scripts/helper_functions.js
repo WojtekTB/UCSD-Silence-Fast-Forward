@@ -275,6 +275,6 @@ function showRatingWindow() {
   document.getElementById('dismissButton').addEventListener('click', function() {
     // Dismiss the window without taking any action
     ratingWindow.remove();
-    localStorage.setItem('extensionRatingWindowClosed', 10+Math.random() * 10);
+    localStorage.setItem('extensionRatingWindowClosed', 7);
   });
 }
