@@ -44,8 +44,8 @@ async function tryFF(){
         const timeUntilNextCaption = videoDuration - currentTime;
         const timeSinceLastSubtitle = currentTime-document.ff_downtime_captions[document.ff_downtime_captions.length - 1].endTime;
         if(
-            timeUntilNextCaption > getLocalStorageIte("MIN_SKIP_TIME_UNTIL_NEXT_CAPTION") && 
-            timeSinceLastSubtitle > getLocalStorageIte("START_SKIP_PADDING_TIME")
+            timeUntilNextCaption > getLocalStorageItem("MIN_SKIP_TIME_UNTIL_NEXT_CAPTION") && 
+            timeSinceLastSubtitle > getLocalStorageItem("START_SKIP_PADDING_TIME")
         ){
             skipUntilTime(videoDuration);
         }
@@ -57,8 +57,8 @@ async function tryFF(){
         const timeUntilNextCaption = currentIndexCaption.startTime-currentTime;
         const timeSinceLastSubtitle = currentTime;
         if(
-            timeUntilNextCaption > getLocalStorageIte("MIN_SKIP_TIME_UNTIL_NEXT_CAPTION") && 
-            timeSinceLastSubtitle > getLocalStorageIte("START_SKIP_PADDING_TIME")
+            timeUntilNextCaption > getLocalStorageItem("MIN_SKIP_TIME_UNTIL_NEXT_CAPTION") && 
+            timeSinceLastSubtitle > getLocalStorageItem("START_SKIP_PADDING_TIME")
         ){
             skipUntilTime(currentIndexCaption.startTime);
         }
@@ -75,8 +75,8 @@ async function tryFF(){
     const timeSinceLastSubtitle = document.lastCaptionIndex > 0 ? currentTime-lastCaption.endTime:999;
 
     if(
-        timeUntilNextCaption > getLocalStorageIte("MIN_SKIP_TIME_UNTIL_NEXT_CAPTION") && 
-        timeSinceLastSubtitle > getLocalStorageIte("START_SKIP_PADDING_TIME")
+        timeUntilNextCaption > getLocalStorageItem("MIN_SKIP_TIME_UNTIL_NEXT_CAPTION") && 
+        timeSinceLastSubtitle > getLocalStorageItem("START_SKIP_PADDING_TIME")
         ){
         // ff to next time
         const timeToSkipTo = currentIndexCaption.startTime;
@@ -88,13 +88,13 @@ async function tryFF(){
 function skipUntilTime(timeToSkipTo){
     if(document.skipSilenceMode){
         // skip to time
-        document.SECONDS_SAVED += (timeToSkipTo - getLocalStorageIte("END_SKIP_PADDING_TIME")) - getVideoElement().currentTime;
+        document.SECONDS_SAVED += (timeToSkipTo - getLocalStorageItem("END_SKIP_PADDING_TIME")) - getVideoElement().currentTime;
         document.secondsSavedCounterLabel.textContent = Math.floor(document.SECONDS_SAVED/1000);
-        getVideoElement().currentTime = timeToSkipTo - getLocalStorageIte("END_SKIP_PADDING_TIME");
+        getVideoElement().currentTime = timeToSkipTo - getLocalStorageItem("END_SKIP_PADDING_TIME");
     }
     else{
         setFastSpeed();
-        document.videoFastForwardTimeout = setTimeout(setNormSpeed, ((timeToSkipTo - getLocalStorageIte("END_SKIP_PADDING_TIME") - getVideoElement().currentTime) * 1000)/document.FAST_SPEED);
+        document.videoFastForwardTimeout = setTimeout(setNormSpeed, ((timeToSkipTo - getLocalStorageItem("END_SKIP_PADDING_TIME") - getVideoElement().currentTime) * 1000)/document.FAST_SPEED);
     }
 }
 
@@ -116,7 +116,7 @@ function addRedRectangle(div, percentStart, percentEnd) {
     
     // Append the red rectangle to the container div
     div.appendChild(redRectangle);
-    document.SILENT_SECTIONS.push(div);
+    document.SILENT_SECTIONS.push(redRectangle);
     return redRectangle;//return for future ref
   }
 
@@ -128,7 +128,7 @@ function generateSkipPeriodsVisualization(){
     let prevEndTime = 0;
     for(let i = 0; i < captions.length; i++){
         const diffToNextCaption = captions[i].startTime - prevEndTime;
-        if(diffToNextCaption > getLocalStorageIte("MIN_SKIP_TIME_UNTIL_NEXT_CAPTION")){
+        if(diffToNextCaption > getLocalStorageItem("MIN_SKIP_TIME_UNTIL_NEXT_CAPTION")){
             // if will be skipped
             addRedRectangle(controlBarElement, prevEndTime/totalVideoTime, captions[i].startTime/totalVideoTime);
         }
@@ -245,18 +245,34 @@ function injectCheckboxAndInterval() {
         setNormSpeed();
         enableSilenceDetection(ffCheckbox.checked);
         showRatingWindow();
+        localStorage.setItem("fast_forward_mode_on", ffCheckbox.checked);
+        localStorage.setItem("skip_forward_mode_on", false);
     }
-
+    
     function handleSkipModeCheckboxChange(){
         document.skipSilenceMode = true;
         ffCheckbox.checked = false;
         setNormSpeed();
         enableSilenceDetection(skipCheckbox.checked);
         showRatingWindow();
+        localStorage.setItem("fast_forward_mode_on", false);
+        localStorage.setItem("skip_forward_mode_on", skipCheckbox.checked);
     }
 
     ffCheckbox.addEventListener('change', handleFFCheckboxChange);
     skipCheckbox.addEventListener('change', handleSkipModeCheckboxChange);
+
+    console.log(localStorage.getItem("fast_forward_mode_on"));
+    console.log(localStorage.getItem("skip_forward_mode_on"));
+
+    if(localStorage.getItem("fast_forward_mode_on") === "true"){
+        ffCheckbox.checked = true;
+        skipCheckbox.checked = false;
+    }
+    else if(localStorage.getItem("skip_forward_mode_on") === "true"){
+        ffCheckbox.checked = false;
+        skipCheckbox.checked = true;
+    }
 }
 
 chrome.storage.sync.get(['skipSpeed', 'normalSpeed'], function (result) {
@@ -274,33 +290,35 @@ function updateValuesOnPage(skipSpeed, normalSpeed) {
 }
 didAddSeekedEvent = false;
 getCaptionsInterval = setInterval(()=>{
-    if(!!getVideoElement() && !!getVideoCaptions() && didAddSeekedEvent && !isNaN(getVideoElement().duration)){
-        generateSkipPeriodsVisualization();
-        clearInterval(getCaptionsInterval);
-    }
-
-    if(!!getVideoElement() && !didAddSeekedEvent){
+    if(!!getVideoElement() && !!getVideoCaptions() && !didAddSeekedEvent && !isNaN(getVideoElement().duration)){
         didAddSeekedEvent = true;
-        injectCheckboxAndInterval();
-        getVideoElement().addEventListener("seeked", ()=>{
-            document.lastCaptionIndex = getCurrentCaptionIndex(getVideoCaptions(), getVideoElement().currentTime);
-            clearTimeout(document.videoFastForwardTimeout);
-            setNormSpeed();
-
-            document.fastforwardImage = document.createElement('img');
-            document.fastforwardImage.src = 'https://i.imgur.com/cjNYz43.png';
-            document.fastforwardImage.style.position = 'absolute';
-            document.fastforwardImage.style.bottom = '5px';
-            document.fastforwardImage.style.right = '5px';
-            document.fastforwardImage.style.zIndex = '9999'; 
-            document.fastforwardImage.style.width = '5%';
-            document.fastforwardImage.style.height = 'auto';
-            document.fastforwardImage.hidden = true;
-            getVideoElement().parentNode.appendChild(document.fastforwardImage);
-        }
-        );
+        whenExtensionIsReady();
     }
+
     if(!getVideoCaptions()){
         pullVideoCaptions();
     }
 }, 100);
+
+function whenExtensionIsReady(){
+    injectCheckboxAndInterval();
+    getVideoElement().addEventListener("seeked", ()=>{
+        document.lastCaptionIndex = getCurrentCaptionIndex(getVideoCaptions(), getVideoElement().currentTime);
+        clearTimeout(document.videoFastForwardTimeout);
+        setNormSpeed();
+
+        document.fastforwardImage = document.createElement('img');
+        document.fastforwardImage.src = 'https://i.imgur.com/cjNYz43.png';
+        document.fastforwardImage.style.position = 'absolute';
+        document.fastforwardImage.style.bottom = '5px';
+        document.fastforwardImage.style.right = '5px';
+        document.fastforwardImage.style.zIndex = '9999'; 
+        document.fastforwardImage.style.width = '5%';
+        document.fastforwardImage.style.height = 'auto';
+        document.fastforwardImage.hidden = true;
+        getVideoElement().parentNode.appendChild(document.fastforwardImage);
+    }
+    );
+    generateSkipPeriodsVisualization();
+    clearInterval(getCaptionsInterval);
+}
