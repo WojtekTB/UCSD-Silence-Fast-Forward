@@ -5,17 +5,24 @@ document.SECONDS_SAVED = 0;
 
 document.SILENT_SECTIONS = [];
 
-defaultSettingValues = {
-    MIN_SKIP_TIME_UNTIL_NEXT_CAPTION: 1, // minimum length of silence until it is skipped
-    START_SKIP_PADDING_TIME: 0.1, // padding to give until the skipping begins
-    END_SKIP_PADDING_TIME: 0.1, // padding to give until the skipping ends
+document.defaultSettingValues = {
+    MIN_SKIP_TIME_UNTIL_NEXT_CAPTION: 2, // minimum length of silence until it is skipped
+    START_SKIP_PADDING_TIME: 0.2, // padding to give until the skipping begins
+    END_SKIP_PADDING_TIME: 0.2, // padding to give until the skipping ends
+    AGGRESSIVENESS: 0.5
 }
 
 function getLocalStorageItem(itemID){
     if(!localStorage.getItem(itemID)){
-        localStorage.setItem(itemID, defaultSettingValues[itemID]);
+        localStorage.setItem(itemID, document.defaultSettingValues[itemID]);
     }
     return localStorage.getItem(itemID);
+}
+
+function setAggressiveness(val){
+    localStorage.setItem("AGGRESSIVENESS", val);
+    const valuesToModify = ["MIN_SKIP_TIME_UNTIL_NEXT_CAPTION", "START_SKIP_PADDING_TIME", "END_SKIP_PADDING_TIME"];
+    valuesToModify.forEach(k=>localStorage.setItem(k, document.defaultSettingValues[k]*val));
 }
 
 async function tryFF(){
