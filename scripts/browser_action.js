@@ -1,11 +1,22 @@
 
 document.FAST_SPEED = 15;
 document.NORM_SPEED = 2;
-document.MIN_SKIP_TIME_UNTIL_NEXT_CAPTION = 1; // minimum length of silence until it is skipped
-document.START_SKIP_PADDING_TIME = 0.1; // padding to give until the skipping begins
-document.END_SKIP_PADDING_TIME = 0.1; // padding to give until the skipping ends
-
 document.SECONDS_SAVED = 0;
+
+document.SILENT_SECTIONS = [];
+
+defaultSettingValues = {
+    MIN_SKIP_TIME_UNTIL_NEXT_CAPTION: 1, // minimum length of silence until it is skipped
+    START_SKIP_PADDING_TIME: 0.1, // padding to give until the skipping begins
+    END_SKIP_PADDING_TIME: 0.1, // padding to give until the skipping ends
+}
+
+function getLocalStorageItem(itemID){
+    if(!localStorage.getItem(itemID)){
+        localStorage.setItem(itemID, defaultSettingValues[itemID]);
+    }
+    return localStorage.getItem(itemID);
+}
 
 async function tryFF(){
     if(document.isFastSpeed){
@@ -26,8 +37,8 @@ async function tryFF(){
         const timeUntilNextCaption = videoDuration - currentTime;
         const timeSinceLastSubtitle = currentTime-document.ff_downtime_captions[document.ff_downtime_captions.length - 1].endTime;
         if(
-            timeUntilNextCaption > document.MIN_SKIP_TIME_UNTIL_NEXT_CAPTION && 
-            timeSinceLastSubtitle > document.START_SKIP_PADDING_TIME
+            timeUntilNextCaption > getLocalStorageIte("MIN_SKIP_TIME_UNTIL_NEXT_CAPTION") && 
+            timeSinceLastSubtitle > getLocalStorageIte("START_SKIP_PADDING_TIME")
         ){
             skipUntilTime(videoDuration);
         }
@@ -39,8 +50,8 @@ async function tryFF(){
         const timeUntilNextCaption = currentIndexCaption.startTime-currentTime;
         const timeSinceLastSubtitle = currentTime;
         if(
-            timeUntilNextCaption > document.MIN_SKIP_TIME_UNTIL_NEXT_CAPTION && 
-            timeSinceLastSubtitle > document.START_SKIP_PADDING_TIME
+            timeUntilNextCaption > getLocalStorageIte("MIN_SKIP_TIME_UNTIL_NEXT_CAPTION") && 
+            timeSinceLastSubtitle > getLocalStorageIte("START_SKIP_PADDING_TIME")
         ){
             skipUntilTime(currentIndexCaption.startTime);
         }
@@ -57,8 +68,8 @@ async function tryFF(){
     const timeSinceLastSubtitle = document.lastCaptionIndex > 0 ? currentTime-lastCaption.endTime:999;
 
     if(
-        timeUntilNextCaption > document.MIN_SKIP_TIME_UNTIL_NEXT_CAPTION && 
-        timeSinceLastSubtitle > document.START_SKIP_PADDING_TIME
+        timeUntilNextCaption > getLocalStorageIte("MIN_SKIP_TIME_UNTIL_NEXT_CAPTION") && 
+        timeSinceLastSubtitle > getLocalStorageIte("START_SKIP_PADDING_TIME")
         ){
         // ff to next time
         const timeToSkipTo = currentIndexCaption.startTime;
@@ -70,14 +81,20 @@ async function tryFF(){
 function skipUntilTime(timeToSkipTo){
     if(document.skipSilenceMode){
         // skip to time
-        document.SECONDS_SAVED += (timeToSkipTo - document.END_SKIP_PADDING_TIME) - getVideoElement().currentTime;
+        document.SECONDS_SAVED += (timeToSkipTo - getLocalStorageIte("END_SKIP_PADDING_TIME")) - getVideoElement().currentTime;
         document.secondsSavedCounterLabel.textContent = Math.floor(document.SECONDS_SAVED/1000);
-        getVideoElement().currentTime = timeToSkipTo - document.END_SKIP_PADDING_TIME;
+        getVideoElement().currentTime = timeToSkipTo - getLocalStorageIte("END_SKIP_PADDING_TIME");
     }
     else{
         setFastSpeed();
-        document.videoFastForwardTimeout = setTimeout(setNormSpeed, ((timeToSkipTo - document.END_SKIP_PADDING_TIME - getVideoElement().currentTime) * 1000)/document.FAST_SPEED);
+        document.videoFastForwardTimeout = setTimeout(setNormSpeed, ((timeToSkipTo - getLocalStorageIte("END_SKIP_PADDING_TIME") - getVideoElement().currentTime) * 1000)/document.FAST_SPEED);
     }
+}
+
+function removeAllRectangles(){
+    document.SILENT_SECTIONS.forEach(div => {
+        div.remove()
+    });
 }
 
 function addRedRectangle(div, percentStart, percentEnd) {
@@ -92,17 +109,19 @@ function addRedRectangle(div, percentStart, percentEnd) {
     
     // Append the red rectangle to the container div
     div.appendChild(redRectangle);
+    document.SILENT_SECTIONS.push(div);
     return redRectangle;//return for future ref
   }
 
 function generateSkipPeriodsVisualization(){
+    removeAllRectangles(); // clear all previous rectangles
     const controlBarElement = getVideoSeekBarElement();
     const captions = getVideoCaptions();
     const totalVideoTime = getVideoElement().duration;
     let prevEndTime = 0;
     for(let i = 0; i < captions.length; i++){
         const diffToNextCaption = captions[i].startTime - prevEndTime;
-        if(diffToNextCaption > document.MIN_SKIP_TIME_UNTIL_NEXT_CAPTION){
+        if(diffToNextCaption > getLocalStorageIte("MIN_SKIP_TIME_UNTIL_NEXT_CAPTION")){
             // if will be skipped
             addRedRectangle(controlBarElement, prevEndTime/totalVideoTime, captions[i].startTime/totalVideoTime);
         }
