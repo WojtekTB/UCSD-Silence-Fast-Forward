@@ -22,7 +22,12 @@ function getLocalStorageItem(itemID){
 function setAggressiveness(val){
     localStorage.setItem("AGGRESSIVENESS", val);
     const valuesToModify = ["MIN_SKIP_TIME_UNTIL_NEXT_CAPTION", "START_SKIP_PADDING_TIME", "END_SKIP_PADDING_TIME"];
-    valuesToModify.forEach(k=>localStorage.setItem(k, document.defaultSettingValues[k]*val));
+    valuesToModify.forEach(k=>{
+        localStorage.setItem(k, document.defaultSettingValues[k]*(1-val));
+        console.log(k, document.defaultSettingValues[k]*(1-val));
+    });
+    generateSkipPeriodsVisualization();
+    console.log(val);
 }
 
 async function tryFF(){
@@ -223,6 +228,27 @@ function injectCheckboxAndInterval() {
     
     actionLinksUl.appendChild(skipCheckbox);
     actionLinksUl.appendChild(skipLabel);
+
+
+    const sliderLabel = document.createElement("label");
+    sliderLabel.textContent = "Aggressiveness:";
+    const slider = document.createElement("input");
+    slider.type = "range";
+    slider.id = "aggressivenessSlider";
+    slider.min = "0";
+    slider.max = "1";
+    slider.step = "0.1";
+
+    // Add elements to the div
+    actionLinksUl.appendChild(sliderLabel);
+    actionLinksUl.appendChild(slider);
+
+    slider.value = getLocalStorageItem("AGGRESSIVENESS");
+
+    // Update displayed value and call whenAggressivenessChanged
+    slider.addEventListener("input", function() {
+        setAggressiveness(this.value);
+    });
     
     actionLinksUl.appendChild(secondsSavedLabel);
     actionLinksUl.appendChild(document.secondsSavedCounterLabel);
@@ -261,9 +287,6 @@ function injectCheckboxAndInterval() {
 
     ffCheckbox.addEventListener('change', handleFFCheckboxChange);
     skipCheckbox.addEventListener('change', handleSkipModeCheckboxChange);
-
-    console.log(localStorage.getItem("fast_forward_mode_on"));
-    console.log(localStorage.getItem("skip_forward_mode_on"));
 
     if(localStorage.getItem("fast_forward_mode_on") === "true"){
         ffCheckbox.checked = true;
